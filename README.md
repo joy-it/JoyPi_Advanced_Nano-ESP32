@@ -1,9 +1,6 @@
 # JoyPi_Advanced_Arduino
  This library is a collection for the Arduino for two modules on the Joy-Pi Advanced. See [here](https://www.joy-pi.net) for more information.
 
-## Dependencies
-TODO: checkout: https://github.com/Schm1tz1/arduino-ms5xxx/tree/master anstatt https://github.com/UravuLabs/MS5607
-
 ## Included modules
 This library includes the following modules:
 - ADC
@@ -22,4 +19,3 @@ This library includes the following modules:
 - `String getTilt()` - returns the tilted direction
 - ` void setScale(int factor, int gyroscope, int range, int offset)` - sets scale factors of the gyroscope
 - `int whoAmI()` - returns specified value to identify itself
-### Keypad_MCP
