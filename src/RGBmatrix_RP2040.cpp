@@ -1,5 +1,5 @@
 #include "RGBmatrix_RP2040_h.h"
 
-rgbmatrix::rgbmatrix(){
+RGB_Matrix::RGB_Matrix(){
     
 }
