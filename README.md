@@ -8,6 +8,7 @@ This library includes the following modules:
 
 ## Library Guide
 ### ADC
+
 - `ADC_TLA2518(int MISO, int MOSI, int SCLK, int SS, int SPI_CLK)` - initialize ADC
 - `void begin()` - starts communication
 - `int read_adc_value(int channel)` - returns raw value from a selected channel
