@@ -1,9 +1,9 @@
-#ifndef RGBmatrix_ESP32_RP2040_h
-#define RGBmatrix_ESP32_RP2040_h
+#ifndef RGBmatrix_RP2040_h
+#define RGBmatrix_RP2040_h
 
-class rgbmatrix_esp32{
+class rgbmatrix{
     public:
-        rgbmatrix_esp32()
+        rgbmatrix()
         begin(void);
         show(void);
         void setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);

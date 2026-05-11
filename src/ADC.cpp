@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include "ADC.h"
+#include "Arduino.h"
 
 ADC_TLA2518::ADC_TLA2518(int MISO, int MOSI, int SCLK, int SS, int SPI_CLK) {
     (*this)._MISO = MISO;
@@ -7,6 +8,7 @@ ADC_TLA2518::ADC_TLA2518(int MISO, int MOSI, int SCLK, int SS, int SPI_CLK) {
     (*this)._SCLK = SCLK;
     (*this)._SS = SS;
     (*this)._SPI_CLK = SPI_CLK;
+    if (BOARD_NAME == "ESP32") (*this)._spiSettings = SPISettings((*this)._SPI_CLK, MSBFIRST, SPI_MODE0);
 }
 
 void ADC_TLA2518::begin() {
