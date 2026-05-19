@@ -1,4 +1,4 @@
-#include "RGBmatrix_RP2040_h.h"
+#include "RGBmatrix_RP2040.h"
 
 //++++++++++++++++++++++++++LED_Transfer_Data Class++++++++++++++++++++++++++
 void LED_Transfer_Data::setFunc(uint8_t func){
@@ -119,12 +119,6 @@ uint32_t RGBW::getValue() const{
 }
 
 //++++++++++++++++++++++++++Pixelstrip Class++++++++++++++++++++++++++
-Pixelstrip::Pixelstrip(int i2c_adress, uint8_t led_count, uint8_t brightness, TwoWire * awire=&Wire){
-    this->_i2c_adress = i2c_adress;
-    this->_led_count = led_count;
-    this->_brightness = brightness;
-    this->_wire = awire;
-}
 Pixelstrip::begin(){
     this->_data.setFunc(FunctionEnum::SETBRIGHTNESS);
     this->send(0x00);
@@ -255,7 +249,7 @@ uint8_t Pixelstrip::getColorHSV(uint8_t x){
 }
 
 //++++++++++++++++++++++++++RGB_Matrix Class++++++++++++++++++++++++++
-RGB_Matrix::RGB_Matrix(int i2c_adress, uint8_t led_count, uint8_t brightness, int* left_border, int*right_border, TwoWire * awire=&Wire){
+RGB_Matrix::RGB_Matrix(int i2c_adress, uint8_t led_count, uint8_t brightness, int* left_border, int*right_border, TwoWire * awire){
     // ToDo default values
     this->_pixelstrip = Pixelstrip(i2c_adress, led_count, brightness, awire);
     this->_left_border = left_border;
