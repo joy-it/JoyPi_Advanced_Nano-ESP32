@@ -1,8 +1,11 @@
 #include "RGBmatrix_RP2040.h"
 
 //++++++++++++++++++++++++++LED_Transfer_Data Class++++++++++++++++++++++++++
-void LED_Transfer_Data::setFunc(uint8_t func){
-    (this->_func) = func;
+LED_Transfer_Data::LED_Transfer_Data() {
+    this->clearObject();
+}
+void LED_Transfer_Data::setFunc(FunctionEnum func){
+    (this->_func) = static_cast<uint8_t>(func);
 }
 uint8_t LED_Transfer_Data::getFunc() const{
     return this->_func;
@@ -49,7 +52,7 @@ void LED_Transfer_Data::setBright(uint8_t bright){
 uint8_t LED_Transfer_Data::getBright() const{
     return this->_bright;
 }
-void LED_Transfer_Data::setFrist(uint8_t first){
+void LED_Transfer_Data::setFirst(uint8_t first){
     (this->_first) = first;
 }
 uint8_t LED_Transfer_Data::getFirst() const{
@@ -73,9 +76,19 @@ void LED_Transfer_Data::setData1(uint8_t data1){
 uint8_t LED_Transfer_Data::getData1() const{
     return this->_data1;
 }
-uint8_t* LED_Transfer_Data::getData(){
-    uint8_t data[12] = {this->_func, this->_pos, this->_red, this->_green, this->_blue, this->_white, this->_c, this->_bright, this->_first, this->_count, this->_data0, this->_data1};
-    return data;
+void LED_Transfer_Data::getData(uint8_t* _transferData){
+    _transferData[0]  = this->_func;
+    _transferData[1]  = this->_pos;
+    _transferData[2]  = this->_red;
+    _transferData[3]  = this->_green;
+    _transferData[4]  = this->_blue;
+    _transferData[5]  = this->_white;
+    _transferData[6]  = this->_c;
+    _transferData[7]  = this->_bright;
+    _transferData[8]  = this->_first;
+    _transferData[9]  = this->_count;
+    _transferData[10] = this->_data0;
+    _transferData[11] = this->_data1;
 }
 void LED_Transfer_Data::clearObject(){
     this->_func = 0;
@@ -117,31 +130,37 @@ uint8_t RGBW::getW() const{
 uint32_t RGBW::getValue() const{
     return this->_value;
 }
-
+void RGBW::getValue(uint8_t* transfer_data){
+    transfer_data[0] = this->getR();
+    transfer_data[1] = this->getG();
+    transfer_data[2] = this->getB();
+    transfer_data[3] = this->getW();
+}
 //++++++++++++++++++++++++++Pixelstrip Class++++++++++++++++++++++++++
-Pixelstrip::begin(){
-    this->_data.setFunc(FunctionEnum::SETBRIGHTNESS);
-    this->send(0x00);
+void Pixelstrip::begin(){
+    this->_data.clearObject();
+    this->setBrightness(this->_brightness);
 }
 void Pixelstrip::send(uint8_t cmd){
-    uint8_t* data = [cmd, 0x0C, this->_data.getData()];
-    this->_wire->beginTransmission(this->_i2c_adress);
-    this->_wire->write(cmd);
-    this->_wire->write(data, 14);
-    this->_wire->endTransmission();
-    delay(3);
+    uint8_t buffer[12];
+    this->_data.getData(buffer);
+    this->_write(cmd, buffer, sizeof(buffer) / sizeof(buffer[0]));
     this->_data.clearObject();
 }
-void Pixelstrip::_write(uint8_t cmd, uint8_t* data){
-    uint8_t* buffer = [cmd, length(data), data];
-    this->_wire->beginTransmission(this->_i2c_adress);
-    this->_wire->write(cmd);
-    this->_wire->write(buffer, length(buffer));
-    this->_wire->endTransmission();
+void Pixelstrip::_write(uint8_t cmd, const uint8_t* data, uint8_t length){
+    uint8_t buffer[2 + length];
+    buffer[0] = static_cast<uint8_t>(cmd & 0xFF);
+    buffer[1] = static_cast<uint8_t>(length & 0xFF);
+    for (uint8_t i = 0; i < length; i++) {
+        buffer[i + 2] = static_cast<uint8_t>(data[i] & 0xFF);
+    }
+    this->_wire->beginTransmission(this->_i2c_address);
+    this->_wire->write(buffer, sizeof(buffer));
+    uint8_t result = this->_wire->endTransmission();
     delay(3);
 }
 uint8_t Pixelstrip::_read(){
-    this->_wire->requestFrom(this->_i2c_adress, 1);
+    this->_wire->requestFrom(this->_i2c_address, 1);
     if (this->_wire->available()){
         return this->_wire->read();
     }
@@ -155,14 +174,6 @@ void Pixelstrip::show(){
     this->_data.setFunc(FunctionEnum::SHOW);
     this->send(0x00);
 }
-uint8_t* Pixelstrip::getWRGB(int color){
-    static uint8_t data[4];
-    data[0] = (color >> 24) & 0xFF;
-    data[1] = (color >> 16) & 0xFF;
-    data[2] = (color >> 8) & 0xFF;
-    data[3] = color & 0xFF;
-    return data;
-}
 void Pixelstrip::setPixelColor(uint8_t pos, RGBW color){
     this->setPixelColorRGB(pos, color.getR(), color.getG(), color.getB(), color.getW());
 }
@@ -175,12 +186,12 @@ void Pixelstrip::setPixelColorRGB(uint8_t pos, uint8_t r, uint8_t g, uint8_t b, 
     this->_data.setWhite(w);
     this->send(0x00);
 }
-void Pixelstrip::sendPos2Show(uint8_t* pos, uint8_t r, uint8_t g, uint8_t b){
-    this->_data.setFunc(FunctionEnum::SENDPOS2SHOW);
+void Pixelstrip::sendPos2Show(uint8_t* pos, uint8_t pos_length, uint8_t r, uint8_t g, uint8_t b){
+    this->_data.setFunc(FunctionEnum::SENDDATA2SHOW);
     this->_data.setRed(r);
     this->_data.setGreen(g);
     this->_data.setBlue(b);
-    for (uint8_t i = 0; i < length(pos); i++){
+    for (uint8_t i = 0; i < pos_length; i++){
         if (pos[i] >= 0 && pos[i] <= 7) this->_data.setPos(this->_data.getPos() | (1 << pos[i]));
         if (pos[i] >= 8 && pos[i] <= 15)this->_data.setWhite(this->_data.getWhite() | (1 << (pos[i] - 8)));
         if (pos[i] >= 16 && pos[i] <= 23) this->_data.setC(this->_data.getC() | (1 << (pos[i] - 16)));
@@ -192,17 +203,8 @@ void Pixelstrip::sendPos2Show(uint8_t* pos, uint8_t r, uint8_t g, uint8_t b){
     }
     this->send(0x00);
 }
-void Pixelstrip::sendColor2Show(uint8_t* pos, uint32_t color){
-    uint8_t* wrgb = this->getWRGB(color);
-    this->sendPos2Show(pos, wrgb[0], wrgb[1], wrgb[2], wrgb[3]);
-}
-void Pixelstrip::sendAllPixRGB(uint32_t color){
-    uint8_t* wrgb = this->getWRGB(color);
-    for (uint8_t i = 0; i < 6; i++){
-        uint8_t start = 32 * i;
-        uint8_t end = start + 32;
-        this->_write(FunctionEnum::SENDALLPIXRGB + i, wrgb[start:end]);
-    }
+void Pixelstrip::sendColor2Show(uint8_t* pos, uint8_t pos_length, RGBW color){
+    this->sendPos2Show(pos, pos_length, color.getR(), color.getG(), color.getB());
 }
 void Pixelstrip::fill(uint8_t r, uint8_t g, uint8_t b, uint8_t w, uint8_t first, uint8_t end){
     this->_data.setFunc(FunctionEnum::FILL);
@@ -214,9 +216,8 @@ void Pixelstrip::fill(uint8_t r, uint8_t g, uint8_t b, uint8_t w, uint8_t first,
     this->_data.setCount(end - first);
     this->send(0x00);
 }
-void Pixelstrip::fillColor(uint32_t color, uint8_t first, uint8_t end){
-    uint8_t* wrgb = this->getWRGB(color);
-    this->fill(wrgb[0], wrgb[1], wrgb[2], wrgb[3], first, end);
+void Pixelstrip::fillColor(RGBW color, uint8_t first, uint8_t end){
+    this->fill(color.getR(), color.getG(), color.getB(), color.getW(), first, end);
 }
 void Pixelstrip::setBrightness(uint8_t brightness){
     this->_brightness = brightness;
@@ -228,13 +229,13 @@ uint8_t Pixelstrip::getNumPixels() const{
     return this->_led_count;
 }
 uint8_t Pixelstrip::getGamma8(uint8_t color){
-    this->_data.setFunc(FunctionEnum::GETGAMMA8);
+    this->_data.setFunc(FunctionEnum::GAMMA8);
     this->_data.setData0(color);
-    this->send(0x01)
+    this->send(0x01);
     return this->_read();
 }
 uint32_t Pixelstrip::getGamma32(uint32_t color){
-    this->_data.setFunc(FunctionEnum::GETGAMMA32);
+    this->_data.setFunc(FunctionEnum::GAMMA32);
     // ToDo smth wrong here
     this->_data.setData0((color >> 16) & 0xFF);
     this->_data.setData1((color >> 8) & 0xFF);
@@ -242,21 +243,19 @@ uint32_t Pixelstrip::getGamma32(uint32_t color){
     return this->_read();
 }
 uint8_t Pixelstrip::getColorHSV(uint8_t x){
-    this->_data.setFunc(FunctionEnum::GETCOLORHSV);
+    this->_data.setFunc(FunctionEnum::COLORHSV);
     this->_data.setData0(x);
     this->send(0x01);
     return this->_read();
 }
 
 //++++++++++++++++++++++++++RGB_Matrix Class++++++++++++++++++++++++++
-RGB_Matrix::RGB_Matrix(int i2c_adress, uint8_t led_count, uint8_t brightness, int* left_border, int*right_border, TwoWire * awire){
-    // ToDo default values
-    this->_pixelstrip = Pixelstrip(i2c_adress, led_count, brightness, awire);
-    this->_left_border = left_border;
-    this->_right_border = right_border;
-    this->_led_count = led_count;
-    this->_brightness = brightness;
-}
+const uint8_t RGB_Matrix::_default_left_border[8] = {
+    0, 8, 16, 24, 32, 40, 48, 56
+};
+const uint8_t RGB_Matrix::_default_right_border[8] = {
+    7, 15, 23, 31, 39, 47, 55, 63
+};
 void RGB_Matrix::begin(){
     this->_pixelstrip.begin();
 }
@@ -266,12 +265,12 @@ void RGB_Matrix::show(){
 void RGB_Matrix::clean(){
     this->RGB_off();
 }
-void RGB_Matrix::setPixelColor(uint8_t position, RGBW colour){
+void RGB_Matrix::setPixel(uint8_t position, RGBW colour){
     this->_pixelstrip.setPixelColor(position, colour);
 }
 void RGB_Matrix::colorWipe(RGBW colour, uint8_t wait){
     for (uint8_t i = 0; i < this->_led_count; i++){
-        this->setPixelColor(i, colour);
+        this->setPixel(i, colour);
         this->show();
         delay(wait);
     }
@@ -279,38 +278,42 @@ void RGB_Matrix::colorWipe(RGBW colour, uint8_t wait){
 void RGB_Matrix::rainbow(uint8_t wait_ms, uint8_t iterations){
     for (int j = 0; j < 256*iterations; j++){
         for (uint8_t i = 0; i < this->_led_count; i++){
-            this->setPixelColor(i, this->wheel(i + j));
+            this->setPixel(i, this->wheel(i + j));
         }
         this->show();
-        delay(wait);
+        delay(wait_ms);
     }
 }
 void RGB_Matrix::theaterChase(RGBW colour, uint8_t wait_ms, uint8_t iterations){
     for (int j = 0; j < iterations; j++){
         for (int q = 0; q < 3; q++){
             for (uint8_t i = 0; i < this->_led_count; i += 3){
-                this->setPixelColor(i + q, colour);
+                this->setPixel(i + q, colour);
             }
             this->show();
             delay(wait_ms);
             for (uint8_t i = 0; i < this->_led_count; i += 3){
-                this->setPixelColor(i + q, RGBW(0));
+                this->setPixel(i + q, RGBW(0));
             }
         }
     }
 }
 void RGB_Matrix::RGB_on(RGBW colour){
     for (uint8_t i = 0; i < this->_led_count; i++){
-        this->setPixelColor(i, colour);
+        this->setPixel(i, colour);
     }
     this->show();
 }
 void RGB_Matrix::RGB_off(){
     for(uint8_t i = 0; i < this->_led_count; i++){
-        this->setPixelColor(i, RGBW(0));
+        this->setPixel(i, RGBW(0));
     }
+    this->show();
 }
-void RGB_Matrix::wheel(uint8_t position){
+void RGB_Matrix::setBrightness(uint8_t brightness){
+    this->_pixelstrip.setBrightness(brightness);
+}
+RGBW RGB_Matrix::wheel(uint8_t position){
     if (position < 85){
         return RGBW(position * 3, 255 - position * 3, 0, 0);
     } 
@@ -336,11 +339,11 @@ void RGB_Matrix::demo2(){
     for (uint8_t i = 0; i < 3; i++){
         this->demo1();
     }
-    uint8_t* heart = [1,6,8,9,10,13,14,15,16,17,18,19,20,21,22,23,
+    uint8_t heart[] = {1,6,8,9,10,13,14,15,16,17,18,19,20,21,22,23,
                          24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,
-                         41,42,43,44,45,46,50,51,52,53,59,60];
-    for (uint8_t i = 0; i < length(heart); i++){
-        this->setPixelColor(heart[i], RGBW(255, 0, 0, 0));
+                         41,42,43,44,45,46,50,51,52,53,59,60};
+    for (uint8_t i = 0; i < sizeof(heart); i++){
+        this->setPixel(heart[i], RGBW(255, 0, 0, 0));
     }
     this->show();
 }

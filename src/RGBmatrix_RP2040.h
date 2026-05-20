@@ -1,9 +1,10 @@
 #ifndef RGBmatrix_RP2040_h
 #define RGBmatrix_RP2040_h
 
-#include "Wire.h"
+#include <Wire.h>
+#include <Arduino.h>
 
-enum class Function : uint8_t {
+enum class FunctionEnum : uint8_t {
     SHOW          = 0,
     SETPIXELCOLOR = 1,
     FILL          = 2,
@@ -36,8 +37,10 @@ class LED_Transfer_Data{
         uint8_t _count;
         uint8_t _data0;
         uint8_t _data1;
+        //uint8_t _transferData[12];
     public:
-        void setFunc(uint8_t func);
+        LED_Transfer_Data();
+        void setFunc(FunctionEnum func);
         uint8_t getFunc() const;
         void setPos(uint8_t pos);
         uint8_t getPos() const;
@@ -61,7 +64,7 @@ class LED_Transfer_Data{
         uint8_t getData0() const;
         void setData1(uint8_t data1);
         uint8_t getData1() const;
-        uint8_t* getData();
+        void getData(uint8_t* _transferData);
         void clearObject();
 };
 
@@ -75,13 +78,15 @@ class RGBW{
         uint8_t getB() const;
         uint8_t getW() const;
         uint32_t getValue() const;
+        void getValue(uint8_t* tranfer_data);
     private:
         uint32_t _value;
 };
 
 class Pixelstrip{
     public:
-        Pixelstrip(int i2c_address=0x66, uint8_t led_count=64, uint8_t brightness=10,TwoWire * awire = &Wire) : _i2c_address(i2c_address), _led_count(led_count), _brightness(brightness), _wire(awire) {};
+        Pixelstrip(int i2c_address=0x66, uint8_t led_count=64, uint8_t brightness=10,TwoWire * awire = &Wire) : _i2c_address(i2c_address), _led_count(led_count), 
+                    _brightness(brightness), _wire(awire) {};
         void begin();
         void send(uint8_t cmd);
         void clear();
@@ -89,49 +94,51 @@ class Pixelstrip{
         uint8_t* getWRGB(int color);
         void setPixelColor(uint8_t pos, RGBW color);
         void setPixelColorRGB(uint8_t pos, uint8_t r, uint8_t g, uint8_t b, uint8_t w);
-        void sendPos2Show(uint8_t pos, uint8_t r, uint8_t g, uint8_t b);
-        void sendColor2Send(uint8_t* pos, uint32_t color);
-        void sendAllPixRGB(uint32_t color);
+        void sendPos2Show(uint8_t* pos, uint8_t pos_length, uint8_t r, uint8_t g, uint8_t b);
+        void sendColor2Show(uint8_t* pos, uint8_t pos_length, RGBW color);
         void fill(uint8_t r, uint8_t g, uint8_t b, uint8_t w, uint8_t first, uint8_t end);
-        void fillColor(uint32_t color, uint8_t first, uint8_t end);
+        void fillColor(RGBW color, uint8_t first, uint8_t end);
         void setBrightness(uint8_t brightness);
         uint8_t getNumPixels() const;
         uint8_t getGamma8(uint8_t color);
         uint32_t getGamma32(uint32_t color);
         uint8_t getColorHSV(uint8_t x);
     private:
-        uint8_t ;
         uint8_t _brightness;
         int _i2c_address;
         uint8_t _led_count;
         TwoWire * _wire;
         LED_Transfer_Data _data;
-        void _write(uint8_t cmd, uint8_t* data);
+        void _write(uint8_t cmd, const uint8_t* data, uint8_t length);
         uint8_t _read();
 };
 
 class RGB_Matrix{
     public:
-        RGB_Matrix(int i2c_address=0x66, uint8_t led_count=64, uint8_t brightness=10, const uint8_t* left_border=default_left_border, const uint8_t* right_border=default_right_border, TwoWire * awire=&Wire);
+        RGB_Matrix(int i2c_address = 0x66, uint8_t led_count = 64, uint8_t brightness = 10, const uint8_t* left_border=_default_left_border, 
+                    const uint8_t* right_border=_default_right_border, TwoWire* awire = &Wire)
+        : _led_count(led_count), _brightness(brightness), _left_border(left_border), _right_border(right_border), _pixelstrip(i2c_address, led_count, brightness, awire)
+        {}
         void begin();
         void show();
         void clean();
-        void setPixel(uint8_t position, uint32_t colour);
-        void colorWipe(uint32_t colour, uint8_t wait_ms=50);
+        void setPixel(uint8_t position, RGBW colour);
+        void colorWipe(RGBW colour, uint8_t wait_ms=50);
         void rainbow(uint8_t wait_ms=20, uint8_t iterations=1);
-        void theaterChase(uint32_t colour, uint8_t wait_ms=50, uint8_t iterations=10);
-        void RGB_on(uint32_t colour);
+        void theaterChase(RGBW colour, uint8_t wait_ms=50, uint8_t iterations=10);
+        void RGB_on(RGBW colour);
         void RGB_off();
-        void wheel(uint8_t position);
+        RGBW wheel(uint8_t position);
         void demo1();
         void demo2();
+        void setBrightness(uint8_t brightness);
     private:
         uint8_t _led_count;
         uint8_t _brightness;
         const uint8_t* _left_border;
         const uint8_t* _right_border;
-        Pixelstrip _strip;
-        static const uint8_t* default_left_border[8] = {0,8,16,24,32,40,48,56};
-        static const uint8_t* PROGMEM default_right_border[8] = {7,15,23,31,39,47,55,63};
+        Pixelstrip _pixelstrip;
+        static const uint8_t _default_left_border[8];
+        static const uint8_t PROGMEM _default_right_border[8];
 };
 #endif
