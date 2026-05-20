@@ -23,7 +23,7 @@
 
 class ADC_TLA2518{    
     public:
-        ADC_TLA2518(int MISO, int MOSI, int SCLK, int SS, int SPI_CLK);
+        ADC_TLA2518(int CS, int SPI_CLK, int MISO, int MOSI, int SCLK, SPIClass* spi = &SPI);
         int read_adc_value(int channel);
         double read_voltage(int channel, int value = -1);
         void begin();
@@ -31,9 +31,12 @@ class ADC_TLA2518{
         int _MISO;
         int _MOSI;
         int _SCLK;
-        int _SS;
+        int _CS;
         int _SPI_CLK;
-        SPISettings _spiSettings;
+
+        SPIClass* _spi;
+        SPISettings _spiSetting;
+        const int _maximum_spi_speed = 1000000;
 
         int read_register(int reg);
         void write_register(int reg, int data);
