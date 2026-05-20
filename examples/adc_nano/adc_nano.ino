@@ -2,13 +2,17 @@
 #include <SPI.h>
 #include "ADC.h"
 
+#define MISO 12
+#define MOSI 11
+#define SCLK 13
+
 // initialize adc
-ADC_TLA2518 adc(12, 11, 13, 10, 2000000);
+ADC_TLA2518 adc(10, 1000000, MISO, MOSI, SCLK, &SPI);
 
 void setup() {
   // setup serial communication for serial monitor
   Serial.begin(9600);
-  // setup SPI
+  // setup virtual SPI
   SPI.begin();
   // setup adc
   adc.begin();
