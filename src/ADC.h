@@ -1,14 +1,9 @@
 #ifndef ADC_h
 #define ADC_h
 
-#if defined(ARDUINO_ARCH_ESP32) || defined(ESP32)
-    #define BOARD_NAME "ESP32"
-#else
-    #define BOARD_NAME "NANO"
-
-#endif 
-
+#include "_Device_Selection.h"
 #include <SPI.h>
+#include <Arduino.h>
 
 #define SYSTEM_STATUS   0x00
 #define GENERAL_CFG     0x01

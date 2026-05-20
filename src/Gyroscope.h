@@ -1,7 +1,9 @@
 #ifndef Gyroscope_h
 #define Gyroscope_h
+#include "_Device_Selection.h"
 
 #include <SPI.h>
+#include <Arduino.h>
 
 class gyroscope_ICG_1020S{
   public:
@@ -10,7 +12,7 @@ class gyroscope_ICG_1020S{
     double _scaleRange;
     int _offset;
 
-    gyroscope_ICG_1020S(int MISO, int MOSI, int SCLK, int SS, int SPI_CLK);
+    gyroscope_ICG_1020S(int CS, int SPI_CLK, int MISO, int MOSI, int SCLK, SPIClass* spi = &SPI);
     double getTemperature();
     String getTilt();
     int whoAmI();
@@ -21,8 +23,10 @@ class gyroscope_ICG_1020S{
     int _MISO;
     int _MOSI;
     int _SCLK;
-    int _SS;
+    int _CS;
     int _SPI_CLK;
+
+    SPIClass* _spi;
     SPISettings _spiSetting;
 
     void _writeRegister(int reg, int data);
