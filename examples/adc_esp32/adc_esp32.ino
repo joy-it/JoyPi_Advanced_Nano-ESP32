@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include <ADC.h>
 
+// define pins for SPI communication
 #define MISO 19
 #define MOSI 23
 #define SCLK 18
