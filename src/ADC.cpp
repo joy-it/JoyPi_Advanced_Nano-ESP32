@@ -42,7 +42,7 @@ int ADC_TLA2518::read_adc_value(int channel) {
     digitalWrite((*this)._CS, HIGH);
     this->_spi->endTransaction();
 
-    int raw = (msb << 8) | lsb;
+    uint16_t  raw = ((uint16_t) msb << 8) | lsb;
     return raw >> 4;
 }
 
