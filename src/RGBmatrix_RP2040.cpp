@@ -347,3 +347,6 @@ void RGB_Matrix::demo2(){
     }
     this->show();
 }
+uint8_t RGB_Matrix::getPixelNumber(){
+    return this->_led_count;
+}

@@ -50,7 +50,7 @@ void loop() {
 
   // display a heart
   int index_symbol = 0;
-  for (int i = 0; i < 64; i++) {
+  for (int i = 0; i < led_matrix.getPixelNumber(); i++) {
     if (heart[index_symbol] == i){
       led_matrix.setPixel(i, RGBW(255, 0, 0));
       index_symbol++;

@@ -132,6 +132,7 @@ class RGB_Matrix{
         void demo1();
         void demo2();
         void setBrightness(uint8_t brightness);
+        uint8_t getPixelNumber();
     private:
         uint8_t _led_count;
         uint8_t _brightness;
