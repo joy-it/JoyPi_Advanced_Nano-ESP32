@@ -1,6 +1,6 @@
 #ifndef Gyroscope_h
 #define Gyroscope_h
-#include "_Device_Selection.h"
+#include "JoyPi_Advanced_Nano-ESP32.h"
 
 #include <SPI.h>
 #include <Arduino.h>

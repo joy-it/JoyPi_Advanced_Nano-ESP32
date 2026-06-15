@@ -1,4 +1,4 @@
-# JoyPi_Advanced_Arduino-ESP32
+# JoyPi_Advanced_Nano-ESP32
  This library is a collection for the Arduino and ESP32 for two modules on the Joy-Pi Advanced. See [here](https://www.joy-pi.net) for more information.
 
 ## Included modules
@@ -22,7 +22,7 @@ This library includes the following modules:
 | [`MFRC522`](https://github.com/miguelbalboa/rfid) | Library to use the RFID module|
 | [`OneWire`](https://www.pjrc.com/teensy/td_libs_OneWire.html) | Library for OneWire communication to use the DS18B20|
 | [`Servo`](https://docs.arduino.cc/libraries/servo/) | Library to use the servo motor with Arduino Nano|
-| [`ESP32_Servo`](https://madhephaestus.github.io/ESP32Servo/annotated.html) | Library to use the servo motor with ESP32|
+| [`ESP32Servo`](https://madhephaestus.github.io/ESP32Servo/annotated.html) | Library to use the servo motor with ESP32|
 | [`VEML6040`](https://github.com/thewknd/VEML6040) | Library to use the colour sensor|
 | [`Adafruit MPR121`](https://github.com/adafruit/Adafruit_MPR121) [`Adafruit BusIO`](https://github.com/adafruit/Adafruit_BusIO) | Library to use the touch pads|
 | [`DHT sensor library`](https://github.com/adafruit/DHT-sensor-library) [`Adafruit Unified Sensor`](https://github.com/adafruit/Adafruit_Sensor)| Library to use the DHT11|
@@ -79,7 +79,7 @@ This library includes the following modules:
 
 ### [`Keypad_MCP`](https://github.com/joeyoung/arduino_keypads/tree/master/Keypad_MCP)
 > [!NOTE]
-> This library is copied into this repository because it is normally necessary to download it and to manually install it. Therefore, to make the installation easier, the files are included in this repository. The licence of the library can be found [here](https://github.com/joy-it/JoyPi_Advanced_Arduino-ESP32/blob/main/src/Keypad_MCP_LICENSE).
+> This library is copied into this repository because it is normally necessary to download it and to manually install it. Therefore, to make the installation easier, the files are included in this repository. The licence of the library can be found [here](https://github.com/joy-it/JoyPi_Advanced_Nano-ESP32/blob/main/src/Keypad_MCP_LICENSE).
 - `Keypad_MCP(char* userKeymap, byte* row, byte* col, byte numRows, byte numCols, byte address, TwoWire * awire=&Wire)` - initialize button matrix with keymap,  array with pins of MCP which are the rows, array with pins of MCP which are the columns, number of rows, number of columns and I2C addres
 - `void begin(char *userKeymap)` -  start communication with defined keymap (how buttons are arranged)
 - `void begin(void)` - start communication with already set keymap
