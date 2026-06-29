@@ -28,7 +28,7 @@ This library includes the following modules:
 | [`DHT sensor library`](https://github.com/adafruit/DHT-sensor-library) [`Adafruit Unified Sensor`](https://github.com/adafruit/Adafruit_Sensor)| Library to use the DHT11|
 | [`hd44780`](https://github.com/duinoWitchery/hd44780)| Library to use the 16x2 LCD|
 | [`IRremote`](https://github.com/Arduino-IRremote/Arduino-IRremote) | Library to use the infrared sensor and easily decode the signal|
-| [`Adafruit SSD1306`](https://github.com/adafruit/Adafruit_SSD1306) [`Adafruit GFX Library`](https://github.com/adafruit/Adafruit-GFX-Library) [`Adafruit BusIO`](https://github.com/adafruit/Adafruit_BusIO)| |
+| [`Adafruit SSD1306`](https://github.com/adafruit/Adafruit_SSD1306) [`Adafruit GFX Library`](https://github.com/adafruit/Adafruit-GFX-Library) [`Adafruit BusIO`](https://github.com/adafruit/Adafruit_BusIO)| Library to use OLED display|
 | [`SSD1306Ascii`](https://github.com/greiman/SSD1306Ascii) | Library to use OLED for project interactive safe because other library needs more dynamic memory|
 | [`Adafruit ST7735 and ST7789 Library`](https://github.com/adafruit/Adafruit-ST7735-Library) [`Adafruit GFX Library`](https://github.com/adafruit/Adafruit-GFX-Library) [`Adafruit seesaw Library`](https://github.com/adafruit/Adafruit_Seesaw) [`Adafruit BusIO`](https://github.com/adafruit/Adafruit_BusIO) [`SD`](https://docs.arduino.cc/libraries/sd/)| Library to use the TFT display|
 | [`RTCDS1307`](https://github.com/offcircuit/RTCDS1307) | Library to use the Real Time Clock |
